@@ -2,16 +2,14 @@ import numpy as np
 
 
 def grid2d(X, example_width=False, display_cols=False):
-    """
-    Display weights in a nice grid
-    ==============================
+    """Display weights in a nice grid
 
     This function assumes that each row of the X is an image weight to be
     resized to a square. After that it creates a 2D grid with with all
     the squares.
 
     Parameters
-    ==========
+    ----------
     X : `numpy.array`
          array with each filter to be transformed to an image on the rows
     example_width: int
