@@ -9,7 +9,7 @@ Agnez
         :target: https://pypi.python.org/pypi/agnez
 
 
-Visualization and report generation library for deep learning.
+Visualization and report generation framework for deep learning.
 
 * Free software: BSD license
 * Documentation: https://agnez.readthedocs.org.
