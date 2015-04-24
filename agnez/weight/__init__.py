@@ -18,7 +18,6 @@ def grid2d(X, example_width=False, display_cols=False):
 
     Borrowed from https://github.com/martinblom/py-sparse-filtering
     """
-    X = X.T
     m, n = X.shape
     if not example_width:
         example_width = int(np.round(np.sqrt(n)))
