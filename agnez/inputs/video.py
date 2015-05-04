@@ -15,4 +15,5 @@ def image_sequence(X, shape):
     '''
     X = X.reshape((-1,)+shape)
     X = X.transpose(1, 2, 0)
+    X = X.reshape((X.shape[0], X.shape[1]*X.shape[2]))
     return X

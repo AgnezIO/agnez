@@ -1,2 +1,2 @@
 from agnez.inputs.video import *
-from agneiz.inputs.fool import *
+from agnez.inputs.fool import *
