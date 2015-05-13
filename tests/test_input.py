@@ -1,6 +1,6 @@
 import numpy as np
 
-from agnez.inputs import image_sequence
+from agnez import image_sequence
 
 
 def test_image_sequence():

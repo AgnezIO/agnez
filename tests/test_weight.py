@@ -1,5 +1,5 @@
 import numpy as np
-from agnez.weight import grid2d
+from agnez import grid2d
 
 
 def test_grid2d():
