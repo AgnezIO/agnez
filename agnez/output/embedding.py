@@ -65,7 +65,8 @@ def timeseries2d(data, train_data=None, method=None):
     t, b, d = data.shape
     data = data.reshape((t*b, d))
     ebd, mtd = embedding2d(data, train_data, method)
-    return ebd.reshape((t, b, -1))
+    ebd = ebd.reshape((t, b, -1))
+    return ebd, mtd
 
 
 def timeseries2dplot(data, labels):
@@ -75,6 +76,7 @@ def timeseries2dplot(data, labels):
     t, b, d = data.shape
     data = data.reshape((t*b, d))
     labels = labels[np.newaxis].repeat(t, axis=0)
+    labels = labels.flatten()
     ebd, mtd = embedding2d(data)
     fig, ax, sc, txts = embedding2dplot(ebd, labels)
     return fig, ax, sc, txts
