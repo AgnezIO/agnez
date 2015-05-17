@@ -2,8 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as PathEffects
 import seaborn as sns
+import moviepy.editor as mpy
 
 from sklearn.decomposition import PCA
+from moviepy.video.io.bindings import mplfig_to_npimage
 
 
 def embedding2d(data, train_data=None, method=None):
@@ -70,7 +72,7 @@ def timeseries2d(data, train_data=None, method=None):
 
 
 def timeseries2dplot(data, labels):
-    '''2D scatter plot of time series usng embeding2d
+    '''2D scatter plot of time series using embeding2d
 
     '''
     t, b, d = data.shape
@@ -80,3 +82,42 @@ def timeseries2dplot(data, labels):
     ebd, mtd = embedding2d(data)
     fig, ax, sc, txts = embedding2dplot(ebd, labels)
     return fig, ax, sc, txts
+
+
+def timeseries2dvideo(data, labels, gif_path='ts2video.gif'):
+    '''2D scatter plot video of times series embedding
+
+    '''
+    # We choose a color palette with seaborn.
+    max_label = labels.max()
+    palette = np.array(sns.color_palette("hls", max_label+1))
+    # We create a scatter plot.
+    fig = plt.figure(figsize=(8, 8))
+    ax = plt.subplot(aspect='equal')
+    plt.xlim(-25, 25)
+    plt.ylim(-25, 25)
+    ax.axis('off')
+    ax.axis('tight')
+
+    # We add the labels for each digit.
+    t, b, d = data.shape
+    data = data.reshape((t*b, d))
+    labels = labels[np.newaxis].repeat(t, axis=0)
+    labels = labels.flatten()
+    colors = []
+    x_data = []
+    y_data = []
+
+    def make_frame(t):
+        pts = data[t]
+        colors.append(palette[labels[t].astype(np.int)])
+        x_data.append(pts[0])
+        y_data.append(pts[1])
+        sc = ax.scatter(x_data, y_data, lw=0, s=40,
+                        c=colors)
+        return mplfig_to_npimage(fig)
+
+    animation = mpy.VideoClip(make_frame,
+                              duration=data.shape[0])
+    animation.write_gif(gif_path, fps=20)
+    return animation
