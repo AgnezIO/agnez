@@ -83,7 +83,7 @@ def timeseries2dplot(data, labels):
     return fig, ax, sc, txts
 
 
-def timeseries2dvideo(data, labels, ani_path='ts2video.mp4'):
+def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
     '''2D scatter plot video of times series embedding
 
     '''
@@ -94,8 +94,8 @@ def timeseries2dvideo(data, labels, ani_path='ts2video.mp4'):
 
     # We add the labels for each digit.
     t, b, d = data.shape
-    data = data.reshape((t*b, d))
-    labels = labels[np.newaxis].repeat(t, axis=0)
+    data = data.transpose(1, 0, 2).reshape((t*b, d))
+    labels = labels[np.newaxis].transpose(1, 0).repeat(t, axis=0)
     labels = labels.flatten()
 
     fig = plt.figure(figsize=(8, 8))
@@ -113,5 +113,5 @@ def timeseries2dvideo(data, labels, ani_path='ts2video.mp4'):
         return ax
 
     ani = animation.FuncAnimation(fig, make_frame, frames=data.shape[0], interval=100, fargs=(fig, ax))
-    ani.save(ani_path)
+    ani.save(ani_path, writer='imagemagick', fps=20)
     return ani
