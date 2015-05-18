@@ -95,7 +95,7 @@ def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
     # We add the labels for each digit.
     t, b, d = data.shape
     data = data.transpose(1, 0, 2).reshape((t*b, d))
-    labels = labels[np.newaxis].transpose(1, 0).repeat(t, axis=0)
+    labels = labels[np.newaxis].repeat(t, axis=0).transpose(1, 0)
     labels = labels.flatten()
 
     fig = plt.figure(figsize=(8, 8))
