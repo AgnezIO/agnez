@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patheffects as PathEffects
 import seaborn as sns
 
+from functools import wraps
 from sklearn.decomposition import PCA
 import matplotlib.animation as animation
 
@@ -83,35 +84,96 @@ def timeseries2dplot(data, labels):
     return fig, ax, sc, txts
 
 
-def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
-    '''2D scatter plot video of times series embedding
-
+def _prepare_fig_labels(data, labels):
+    '''Helper function for settiing up animation canvas
     '''
-    # We choose a color palette with seaborn.
+    # we choose a color palette with seaborn.
     max_label = labels.max()
     palette = np.array(sns.color_palette("hls", max_label+1))
-    # We create a scatter plot.
+    # we create a scatter plot.
 
-    # We add the labels for each digit.
+    # we add the labels for each digit.
     t, b, d = data.shape
     data = data.transpose(1, 0, 2).reshape((t*b, d))
     labels = labels[np.newaxis].repeat(t, axis=0).transpose(1, 0)
     labels = labels.flatten()
 
     fig = plt.figure(figsize=(8, 8))
-    ax = plt.subplot(aspect='equal')
+    return labels, palette, fig
+
+
+def _prepare_axis(data, subplot):
+    ax = plt.subplot(subplot, aspect='equal')
     xymin = data.min()-data.std()/3
     xymax = data.max()+data.std()/3
     plt.xlim(xymin, xymax)
     plt.ylim(xymin, xymax)
     ax.axis('off')
+    return ax
 
-    def make_frame(t, fig, ax):
+
+def animate(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        make_frame, fig, fargs, video_length, ani_path = func(*args, **kwargs)
+        ani = animation.FuncAnimation(fig, make_frame, frames=video_length, interval=100,
+                                      fargs=fargs)
+        ani.save(ani_path, writer='imagemagick', fps=10)
+        return ani
+    return wrapper
+
+
+@animate
+def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
+    '''2d scatter plot video of times series embedding
+
+    '''
+    labels, palette, fig = _prepare_fig_labels(data, labels)
+    ax = _prepare_axis(data, 111)
+    t, b, d = data.shape
+    data = data.transpose(1, 0, 2).reshape((t*b, d))
+    sc = ax.scatter([], [])
+
+    def make_frame(t, sc):
         pts = data[t]
-        color = palette[labels[t].astype(np.int)]
-        ax.scatter(pts[0], pts[1], c=color)
-        return ax
+        color = np.hstack([palette[labels[t].astype(np.int)], 1.])
+        offsets = np.vstack([sc.get_offsets(), pts])
+        sc.set_offsets(offsets)
+        colors = np.vstack([sc.get_facecolors(), color])
+        sc.set_facecolors(colors)
+        return sc
+    return make_frame, fig, (sc,), data.shape[0], ani_path
 
-    ani = animation.FuncAnimation(fig, make_frame, frames=data.shape[0], interval=100, fargs=(fig, ax))
-    ani.save(ani_path, writer='imagemagick', fps=20)
-    return ani
+    # ani = animation.FuncAnimation(fig, make_frame, frames=data.shape[0], interval=100, fargs=(sc,))
+    # ani.save(ani_path, writer='imagemagick', fps=10)
+    # return ani
+
+
+@animate
+def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
+    '''2d scatter plot video of times series embedding
+
+    '''
+    labels, palette, fig = _prepare_fig_labels(embedding, labels)
+    ax1 = _prepare_axis(embedding, 121)
+    ax2 = _prepare_axis(embedding, 122)
+    vid = ax1.imshow([], cmap='gray')
+    sc = ax2.scatter([], [])
+
+    t, b, d = embedding.shape
+    embedding = embedding.transpose(1, 0, 2).reshape((t*b, d))
+    t, b, d = video.shape
+    video = video.transpose(1, 0, 2).reshape((t*b, np.sqrt(d), np.sqrt(d)))
+
+    def make_frame(t, sc, vid):
+        pts = embedding[t]
+        frame = video[t]
+        color = np.hstack([palette[labels[t].astype(np.int)], 1.])
+        offsets = np.vstack([sc.get_offsets(), pts])
+        sc.set_offsets(offsets)
+        colors = np.vstack([sc.get_facecolors(), color])
+        sc.set_facecolors(colors)
+        vid.set_array(frame)
+        return sc
+
+    return make_frame, fig, (sc, vid), t*b, ani_path
