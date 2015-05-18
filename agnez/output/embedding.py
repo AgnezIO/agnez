@@ -157,13 +157,14 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
     labels, palette, fig = _prepare_fig_labels(embedding, labels)
     ax1 = _prepare_axis(embedding, 121)
     ax2 = _prepare_axis(embedding, 122)
-    vid = ax1.imshow([], cmap='gray')
     sc = ax2.scatter([], [])
 
     t, b, d = embedding.shape
     embedding = embedding.transpose(1, 0, 2).reshape((t*b, d))
     t, b, d = video.shape
     video = video.transpose(1, 0, 2).reshape((t*b, np.sqrt(d), np.sqrt(d)))
+
+    vid = ax1.imshow(np.zeros(video.shape[1:]), cmap='gray')
 
     def make_frame(t, sc, vid):
         pts = embedding[t]
