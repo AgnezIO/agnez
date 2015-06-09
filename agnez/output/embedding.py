@@ -116,7 +116,7 @@ def animate(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         make_frame, fig, fargs, video_length, ani_path = func(*args, **kwargs)
-        ani = animation.FuncAnimation(fig, make_frame, frames=video_length, interval=100,
+        ani = animation.FuncAnimation(fig, make_frame, frames=video_length, interval=1000,
                                       fargs=fargs)
         ani.save(ani_path, writer='imagemagick', fps=10)
         return ani
@@ -162,19 +162,23 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
     t, b, d = embedding.shape
     embedding = embedding.transpose(1, 0, 2).reshape((t*b, d))
     t, b, d = video.shape
-    video = video.transpose(1, 0, 2).reshape((t*b, np.sqrt(d), np.sqrt(d)))
+    video = video.transpose(1, 0, 2).reshape((t*b, d))
+    dim = np.sqrt(d).astype('int')
 
-    vid = ax1.imshow(np.zeros(video.shape[1:]), cmap='gray')
+    init_frame = video[0].reshape((dim, dim))
+    vid = ax1.imshow(init_frame, cmap='gist_gray_r', vmin=video.min(), vmax=video.max())
+    # plt.draw()
 
     def make_frame(t, sc, vid):
         pts = embedding[t]
-        frame = video[t]
+        frame = video[t].reshape((dim, dim))
+        assert frame.shape == (28, 28)
         color = np.hstack([palette[labels[t].astype(np.int)], 1.])
         offsets = np.vstack([sc.get_offsets(), pts])
         sc.set_offsets(offsets)
         colors = np.vstack([sc.get_facecolors(), color])
         sc.set_facecolors(colors)
-        vid.set_array(frame)
-        return sc
+        vid.set_data(frame)
+        return sc, vid
 
     return make_frame, fig, (sc, vid), t*b, ani_path
