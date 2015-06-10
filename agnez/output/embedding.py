@@ -102,12 +102,13 @@ def _prepare_fig_labels(data, labels):
     return labels, palette, fig
 
 
-def _prepare_axis(data, subplot):
+def _prepare_axis(subplot, data=None):
     ax = plt.subplot(subplot, aspect='equal')
-    xymin = data.min()-data.std()/3
-    xymax = data.max()+data.std()/3
-    plt.xlim(xymin, xymax)
-    plt.ylim(xymin, xymax)
+    if data is not None:
+        xymin = data.min()-data.std()/3
+        xymax = data.max()+data.std()/3
+        plt.xlim(xymin, xymax)
+        plt.ylim(xymin, xymax)
     ax.axis('off')
     return ax
 
@@ -118,7 +119,7 @@ def animate(func):
         make_frame, fig, fargs, video_length, ani_path = func(*args, **kwargs)
         ani = animation.FuncAnimation(fig, make_frame, frames=video_length, interval=100,
                                       fargs=fargs)
-        ani.save(ani_path, writer='imagemagick', fps=10)
+        ani.save(ani_path, writer='imagemagick', fps=5)
         return ani
     return wrapper
 
@@ -139,7 +140,7 @@ def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
         path to save the animation
     '''
     labels, palette, fig = _prepare_fig_labels(data, labels)
-    ax = _prepare_axis(data, 111)
+    ax = _prepare_axis(111, data)
     t, b, d = data.shape
     data = data.transpose(1, 0, 2).reshape((t*b, d))
     sc = ax.scatter([], [])
@@ -179,8 +180,8 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
 
     '''
     labels, palette, fig = _prepare_fig_labels(embedding, labels)
-    ax1 = _prepare_axis(video, 121)
-    ax2 = _prepare_axis(embedding, 122)
+    ax2 = _prepare_axis(121, embedding)
+    ax1 = _prepare_axis(122)
     sc = ax2.scatter([], [])
 
     t, b, d = embedding.shape
