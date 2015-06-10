@@ -116,7 +116,7 @@ def animate(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         make_frame, fig, fargs, video_length, ani_path = func(*args, **kwargs)
-        ani = animation.FuncAnimation(fig, make_frame, frames=video_length, interval=1000,
+        ani = animation.FuncAnimation(fig, make_frame, frames=video_length, interval=100,
                                       fargs=fargs)
         ani.save(ani_path, writer='imagemagick', fps=10)
         return ani
@@ -127,6 +127,16 @@ def animate(func):
 def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
     '''2d scatter plot video of times series embedding
 
+    Parameters
+    ----------
+    data: `numpy.array`
+        numpy array with dimensions (time, samples, 2)
+    labels: `numpy.array`
+        numpy vector with the label of each sample in data. `labels`
+        must have the same number of elements as the second dimension
+        of data
+    ani_path: str
+        path to save the animation
     '''
     labels, palette, fig = _prepare_fig_labels(data, labels)
     ax = _prepare_axis(data, 111)
@@ -141,9 +151,9 @@ def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
         sc.set_offsets(offsets)
         colors = np.vstack([sc.get_facecolors(), color])
         sc.set_facecolors(colors)
-        return sc
     return make_frame, fig, (sc,), data.shape[0], ani_path
 
+    # TODO delete this
     # ani = animation.FuncAnimation(fig, make_frame, frames=data.shape[0], interval=100, fargs=(sc,))
     # ani.save(ani_path, writer='imagemagick', fps=10)
     # return ani
@@ -151,11 +161,25 @@ def timeseries2dvideo(data, labels, ani_path='ts2video.gif'):
 
 @animate
 def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
-    '''2d scatter plot video of times series embedding
+    '''2D scatter plot video of times series embedding along side
+    its original image sequence.
+
+    Parameters
+    ----------
+    video: 3D `numpy.array`
+        array with image sequences with dimensions (frames, samples, dim)
+    embedding: 3D `numpy.array`
+        2D embedding of each video with dimensions (frames, samples, 2)
+    labels: `numpy.array`
+        numpy vector with the label of each sample in data. `labels`
+        must have the same number of elements as the second dimension
+        of data
+    ani_path: str
+        path to save the animation
 
     '''
     labels, palette, fig = _prepare_fig_labels(embedding, labels)
-    ax1 = _prepare_axis(embedding, 121)
+    ax1 = _prepare_axis(video, 121)
     ax2 = _prepare_axis(embedding, 122)
     sc = ax2.scatter([], [])
 
@@ -172,7 +196,6 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
     def make_frame(t, sc, vid):
         pts = embedding[t]
         frame = video[t].reshape((dim, dim))
-        assert frame.shape == (28, 28)
         color = np.hstack([palette[labels[t].astype(np.int)], 1.])
         offsets = np.vstack([sc.get_offsets(), pts])
         sc.set_offsets(offsets)
