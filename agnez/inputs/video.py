@@ -14,6 +14,10 @@ def image_sequence(X, shape):
 
     '''
     X = X.reshape((-1,)+shape)
-    X = X.swapaxes(0, 1)
-    X = X.reshape((X.shape[0], X.shape[1]*X.shape[2]))
+    if len(shape) == 3:
+        X = X.swapaxes(0, 2)
+        X = X.reshape(shape[0], X.shape[2], shape[1]*shape[2])
+    else:
+        X = X.swapaxes(0, 1)
+        X = X.reshape((X.shape[0], X.shape[1]*X.shape[2]))
     return X
