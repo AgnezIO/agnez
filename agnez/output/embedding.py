@@ -217,14 +217,14 @@ def video_grid(video, ani_path='video_grid.gif'):
     Parameters
     ----------
     video: 3D `numpy.array`
-        array with image sequences with dimensions (time, samples, dim)
+        array with image sequences with dimensions (frames, samples, dim)
     ani_path: str
         path to save the animation
 
     '''
     fig = plt.figure()
     ax1 = _prepare_axis(111)
-    b, t, d = video.shape
+    t, b, d = video.shape
 
     grid = grid2d(video[:, 0, :])
 
@@ -232,7 +232,7 @@ def video_grid(video, ani_path='video_grid.gif'):
     # plt.draw()
 
     def make_frame(t, vid):
-        frame = video[:, t, :]
+        frame = video[t]
         vid.set_data(frame)
         return vid
 
