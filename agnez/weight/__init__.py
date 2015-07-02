@@ -57,7 +57,8 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1):
         if curr_ex >= m:
             break
     visual = (display_array - display_array.min()) / (display_array.max() - display_array.min())
-    return visual  # display_array
+    visual = np.nan_to_num(visual)
+    return display_array
 
 
 def pref_grid(above, bellow, num_preferred=10, abs_value=True, pad_col=5):

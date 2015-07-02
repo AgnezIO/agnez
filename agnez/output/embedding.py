@@ -228,12 +228,12 @@ def video_grid(video, ani_path='video_grid.gif'):
 
     grid = grid2d(video[:, 0, :])
 
-    vid = ax1.imshow(grid, cmap='gist_gray_r', vmin=video.min(), vmax=video.max())
+    vid = ax1.imshow(grid, cmap='gray')
     # plt.draw()
 
     def make_frame(t, vid):
-        frame = video[t]
-        vid.set_data(frame)
+        grid = grid2d(video[t])
+        vid.set_data(grid)
         return vid
 
     return make_frame, fig, (vid,), t, ani_path
