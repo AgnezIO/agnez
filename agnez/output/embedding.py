@@ -7,6 +7,8 @@ from functools import wraps
 from sklearn.decomposition import PCA
 import matplotlib.animation as animation
 
+from agnez import grid2d
+
 
 def embedding2d(data, train_data=None, method=None):
     '''2D embedding for visualization
@@ -206,3 +208,32 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
         return sc, vid
 
     return make_frame, fig, (sc, vid), t*b, ani_path
+
+
+@animate
+def video_grid(video, ani_path='video_grid.gif'):
+    '''2D video grid for parallel visualization
+
+    Parameters
+    ----------
+    video: 3D `numpy.array`
+        array with image sequences with dimensions (time, samples, dim)
+    ani_path: str
+        path to save the animation
+
+    '''
+    fig = plt.figure()
+    ax1 = _prepare_axis(111)
+    b, t, d = video.shape
+
+    grid = grid2d(video[:, 0, :])
+
+    vid = ax1.imshow(grid, cmap='gist_gray_r', vmin=video.min(), vmax=video.max())
+    # plt.draw()
+
+    def make_frame(t, vid):
+        frame = video[:, t, :]
+        vid.set_data(frame)
+        return vid
+
+    return make_frame, fig, (vid,), t, ani_path
