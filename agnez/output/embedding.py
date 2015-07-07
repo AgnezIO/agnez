@@ -211,7 +211,7 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
 
 
 @animate
-def video_grid(video, ani_path='video_grid.gif'):
+def video_grid(video, ani_path='video_grid.gif', rescale=False):
     '''2D video grid for parallel visualization
 
     Parameters
@@ -220,6 +220,8 @@ def video_grid(video, ani_path='video_grid.gif'):
         array with image sequences with dimensions (frames, samples, dim)
     ani_path: str
         path to save the animation
+    rescale: bool
+        flag to rescale displayed images by grid2d
 
     '''
     fig = plt.figure()
@@ -232,7 +234,7 @@ def video_grid(video, ani_path='video_grid.gif'):
     # plt.draw()
 
     def make_frame(t, vid):
-        grid = grid2d(video[t])
+        grid = grid2d(video[t], rescale=rescale)
         vid.set_data(grid)
         return vid
 
