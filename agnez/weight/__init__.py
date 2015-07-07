@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1):
+def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, rescale=True):
     """Display weights in a nice grid
 
     This function assumes that each row of the X is an image weight to be
@@ -58,7 +58,8 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1):
             break
     visual = (display_array - display_array.min()) / (display_array.max() - display_array.min())
     visual = np.nan_to_num(visual)
-    return display_array
+    ret = visual if rescale else display_array
+    return ret
 
 
 def pref_grid(above, bellow, num_preferred=10, abs_value=True, pad_col=5):
