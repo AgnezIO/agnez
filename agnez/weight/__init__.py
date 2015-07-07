@@ -57,7 +57,7 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, res
         if curr_ex >= m:
             break
     visual = (display_array - display_array.min()) / (display_array.max() - display_array.min())
-    # visual = np.nan_to_num(visual)
+    visual = np.nan_to_num(visual)
     ret = visual if rescale else display_array
     return ret
 
