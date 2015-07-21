@@ -16,7 +16,7 @@ class GaborFit(Layer):
         init0 = initializations.get('zero')
         init1 = initializations.get('uniform')
         xydim = np.sqrt(output_dim)
-        x, y = np.meshgrid(-1, 1, (xydim, xydim))
+        x, y = np.meshgrid((np.linspace(-1, 1, xydim),)*2)
         self.x = theano.shared(x.ravel().astype(floatX))
         self.y = theano.shared(y.ravel().astype(floatX))
         self.x0 = init0((1,))
