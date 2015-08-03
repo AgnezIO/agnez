@@ -1,4 +1,5 @@
 import numpy as np
+from gaborfitting import *
 
 
 def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, rescale=True):
