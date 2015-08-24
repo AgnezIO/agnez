@@ -75,7 +75,7 @@ We will visualize the weights of the first layer. Note that Grid2D assumes
 each filter is in a different row, this is why we transpose W.
 '''
 grid = Grid2D(fig_name="First layer weights", url='default',
-              W=model.layers[0].W) # TODO transpose W by default?
+              W=model.layers[0].W.T) # TODO transpose W by default?
 
 model.fit(X_train, Y_train, batch_size=batch_size,
           nb_epoch=nb_epoch, show_accuracy=True, verbose=2,
