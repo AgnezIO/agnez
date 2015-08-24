@@ -34,6 +34,7 @@ from agnez.keras_callbacks import Grid2D, Plot
     In this example, we assume you are running a local server.
 '''
 
+# this live plots the training and validation loss
 plot = Plot(fig_name='MNIST MLP example', url='default')
 
 batch_size = 100
@@ -70,7 +71,7 @@ rms = RMSprop()
 model.compile(loss='categorical_crossentropy', optimizer=rms)
 
 '''
-We will visualize the weights from the first layer. Note that Grid2D assumes
+We will visualize the weights of the first layer. Note that Grid2D assumes
 each filter is in a different row, this is why we transpose W.
 '''
 grid = Grid2D(fig_name="First layer weights", url='default',
