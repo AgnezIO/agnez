@@ -19,6 +19,8 @@ class BokehCallback(Callback):
             ``http://alice:5006``. When not specified the default configured
             by ``bokeh_server`` in ``.blocksrc`` will be used. Defaults to
             ``http://localhost:5006/``.
+
+        Reference: mila-udem/blocks-extras
         """
         Callback.__init__(self)
         self.fig_name = fig_name
@@ -81,10 +83,8 @@ class Plot(BokehCallback):
 
 class Grid2D(BokehCallback):
     '''
-    Depends on agnez.grid2D
-
-    W: weight to be visualize, each filter should go into a row, filters sizes
-       must be square
+    W: weight matrix to visualize, each filter should go into a row,
+       filters sizes must be square
     '''
     def __init__(self, W, fig_name='grid', url='default',):
         BokehCallback.__init__(self, fig_name, url)
