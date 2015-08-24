@@ -26,6 +26,7 @@ class BokehCallback(Callback):
         self.fig_name = fig_name
         self.plots = []
         output_server(fig_name, url=url)
+        cursession().publish()
 
 
 class Plot(BokehCallback):
