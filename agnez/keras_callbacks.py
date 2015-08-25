@@ -113,10 +113,9 @@ class Grid2D(BokehCallback):
     def __init__(self, W, name='experiment', fig_title='grid', url='default',):
         BokehCallback.__init__(self, name, fig_title, url)
         self.W = W
-        self.F = theano.function([], W)
 
     def get_image(self):
-        W = W.get_value().T
+        W = self.W.get_value().T
         return grid2d(W)
 
 

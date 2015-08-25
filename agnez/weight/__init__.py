@@ -1,5 +1,6 @@
 import numpy as np
 from gaborfitting import *
+import theano.tensor as T
 
 
 def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, rescale=True):
@@ -148,8 +149,8 @@ class DeepPref():
             first = i*self.num_preferred
             last = (i+1)*self.num_preferred
             if self.sum_preferences:
-                X[i] = W[prefs].sum(axis=0)
+                X[i] = (W[prefs]*w).sum(axis=0)
             else:
                 X[first:last] = W[prefs]
-        visual = grid2d(X, pad_row=1, pad_col=self.pad_col)
+        visual = grid2d(X, pad_row=self.pad_col, pad_col=1)
         return visual[:, self.pad_col-1:-self.pad_col+1]

@@ -73,7 +73,7 @@ each filter is in a different row, this is why we transpose W.
 '''
 ex_name = 'keras_example'
 grid = Grid2D(name=ex_name, fig_title="First layer weights", url='default',
-              W=model.layers[0].W.T) # TODO transpose W by default?
+              W=model.layers[0].W) # TODO transpose W by default?
 # think grid2d for hidden layers
 pref = PreferedInput(name=ex_name, fig_title="Second layer preferences",
                      url='default', model=model, layer=3) # Layer 3 is the
