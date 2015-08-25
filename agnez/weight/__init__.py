@@ -149,7 +149,7 @@ class DeepPref():
             first = i*self.num_preferred
             last = (i+1)*self.num_preferred
             if self.sum_preferences:
-                X[i] = (W[prefs]*w).sum(axis=0)
+                X[i] = (W[prefs]*w[prefs, None]).sum(axis=0)
             else:
                 X[first:last] = W[prefs]
         visual = grid2d(X, pad_row=self.pad_col, pad_col=1)
