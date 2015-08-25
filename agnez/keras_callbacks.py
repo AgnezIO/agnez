@@ -1,7 +1,4 @@
 '''This provides visualization tools for Keras.'''
-
-import theano
-
 from . import grid2d, DeepPref
 
 from keras.callbacks import Callback
