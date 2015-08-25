@@ -9,7 +9,7 @@ from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import SGD, Adam, RMSprop
 from keras.utils import np_utils
 
-from agnez.keras_callbacks import Grid2D, Plot
+from agnez.keras_callbacks import Grid2D, Plot, PreferedInput
 
 '''
     Borrowed from keras/examples/mlp_mnist.py
@@ -33,9 +33,6 @@ from agnez.keras_callbacks import Grid2D, Plot
 
     In this example, we assume you are running a local server.
 '''
-
-# this live plots the training and validation loss
-plot = Plot(fig_name='MNIST MLP example', url='default')
 
 batch_size = 100
 nb_classes = 10
@@ -74,12 +71,24 @@ model.compile(loss='categorical_crossentropy', optimizer=rms)
 We will visualize the weights of the first layer. Note that Grid2D assumes
 each filter is in a different row, this is why we transpose W.
 '''
-grid = Grid2D(fig_name="First layer weights", url='default',
+ex_name = 'keras_example'
+grid = Grid2D(name=ex_name, fig_title="First layer weights", url='default',
               W=model.layers[0].W.T) # TODO transpose W by default?
+# think grid2d for hidden layers
+pref = PreferedInput(name=ex_name, fig_title="Second layer preferences",
+                     url='default', model=model, layer=3) # Layer 3 is the
+                                                          # second Dense layer
+sum_pref = PreferedInput(sum_preferences=True, name=ex_name,
+                         fig_title="Second layer preferences (summed up)",
+                         url='default', model=model, layer=3) # Layer 3 is the
+# this live plots the training and validation loss
+plot = Plot(name=ex_name, fig_title='MNIST MLP example', url='default')
+
 
 model.fit(X_train, Y_train, batch_size=batch_size,
           nb_epoch=nb_epoch, show_accuracy=True, verbose=2,
-          validation_data=(X_test, Y_test), callbacks=[plot, grid])
+          validation_data=(X_test, Y_test), callbacks=[plot, grid, pref,
+                                                       sum_pref])
 
 score = model.evaluate(X_test, Y_test, show_accuracy=True, verbose=0)
 print('Test score:', score[0])

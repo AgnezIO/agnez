@@ -2,7 +2,7 @@
 
 import theano
 
-from . import grid2d
+from . import grid2d, DeepPref
 
 from keras.callbacks import Callback
 from bokeh.plotting import (cursession, figure, output_server,
@@ -26,7 +26,7 @@ class BokehCallback(Callback):
         self.name = name
         self.fig_title = fig_title
         self.plots = []
-        output_server(fig_title, url=url)
+        output_server(name, url=url)
         cursession().publish()
 
     def get_image(self):
@@ -58,7 +58,8 @@ class Plot(BokehCallback):
     Inspired by https://github.com/mila-udem/blocks-extras/blob/master/blocks/extras/extensions/plot.py
 
     '''
-    def __init__(self, name, fig_title='training', url='default'):
+    def __init__(self, name='experiment', fig_title='Cost functions',
+                 url='default'):
         BokehCallback.__init__(self, name, fig_title, url)
         self.totals = {}
 
@@ -109,14 +110,14 @@ class Grid2D(BokehCallback):
     See also BokehCallback `on_batch_end` method
 
     '''
-    def __init__(self, W, fig_title='grid', url='default',):
+    def __init__(self, W, name='experiment', fig_title='grid', url='default',):
         BokehCallback.__init__(self, name, fig_title, url)
         self.W = W
         self.F = theano.function([], W)
 
     def get_image(self):
-        return grid2d(self.F())
-
+        W = W.get_value().T
+        return grid2d(W)
 
 
 class PreferedInput(BokehCallback):
@@ -131,10 +132,11 @@ class PreferedInput(BokehCallback):
 
     '''
     def __init__(self, model, layer, name='experiment', fig_title='pref_grid',
-                 url='default',):
+                 url='default', sum_preferences=False):
         BokehCallback.__init__(self, name, fig_title, url)
         self.model = model
-        self.deep_pref = DeepPref(model, layer)
+        self.sum_preferences = sum_preferences
+        self.deep_pref = DeepPref(model, layer, sum_preferences=sum_preferences)
 
     def get_image(self):
         return self.deep_pref.get_pref()

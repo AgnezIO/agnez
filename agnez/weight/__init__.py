@@ -118,28 +118,38 @@ class DeepPref():
 
     """
     def __init__(self, model, layer, num_preferred=10, abs_value=True,
-                 pad_col=5):
+                 pad_col=5, sum_preferences=False):
         self.model = model
         self.layer = layer
         self.num_preferred = num_preferred
         self.abs_value = abs_value
         self.pad_col = pad_col
+        self.sum_preferences = sum_preferences
         X = model.get_input()
         Y = model.layers[layer].get_output()
+        if self.sum_preferences:
+            Y = T.nnet.softmax(Y)
         self.F = theano.function([X], Y, allow_input_downcast=True)
-        above = model.layers[layer].W.get_value().shape[1]
-        self.idx = np.random.randint(above, size=num_preferred)
+        num_weights_out = model.layers[layer].W.get_value().shape[1]
+        self.idx = np.random.randint(num_weights_out,
+                                     size=num_preferred)
 
     def get_pref(self):
-        W = model.layers[0].get_value().T
+        W = self.model.layers[0].W.get_value().T
         Y = self.F(W)
-        R = np.abs(above[:, idx]) if self.abs_value else above[:, idx]
-        X = np.zeros((self.num_preferred**2, W.shape[1]))
+        R = np.abs(Y[:, self.idx]) if self.abs_value else Y[:, self.idx]
+        if self.sum_preferences:
+            X = np.zeros((self.num_preferred, W.shape[1]))
+        else:
+            X = np.zeros((self.num_preferred**2, W.shape[1]))
         for i, w in enumerate(R.T):
             s = np.argsort(w)
-            prefs = s[:-num_preferred-1:-1]
-            first = i*num_preferred
-            last = (i+1)*num_preferred
-            X[first:last] = W[prefs]
-        visual = grid2d(X, pad_row=1, pad_col=pad_col)
-        return visual[:, pad_col-1:-pad_col+1]
+            prefs = s[:-self.num_preferred-1:-1]
+            first = i*self.num_preferred
+            last = (i+1)*self.num_preferred
+            if self.sum_preferences:
+                X[i] = W[prefs].sum(axis=0)
+            else:
+                X[first:last] = W[prefs]
+        visual = grid2d(X, pad_row=1, pad_col=self.pad_col)
+        return visual[:, self.pad_col-1:-self.pad_col+1]
