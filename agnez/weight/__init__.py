@@ -19,9 +19,9 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, res
         not square
     display_cols: bool
     pad_row: int
-        integer number of pixels between vertical neighbors
+        integer number of pixels between up/down neighbors
     pad_col: int
-        integer number of pixels between horizontal neighbors
+        integer number of pixels between left/right neighbors
 
     Adapted from https://github.com/martinblom/py-sparse-filtering
 
@@ -64,7 +64,7 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, res
     return ret
 
 
-def pref_grid(above, bellow, num_preferred=10, abs_value=True, pad_col=5):
+def pref_grid(above, bellow, num_preferred=9, abs_value=True, pad_row=5):
     """Display the weights that the layer above prefers on the layer below
 
     This function looks for the `num_preferred` larger values on the layer
@@ -84,8 +84,8 @@ def pref_grid(above, bellow, num_preferred=10, abs_value=True, pad_col=5):
         if True chooses the preferred as the weights associated with
         maximum absolute activation. Else, uses only the maximum (positve)
         values.
-    pad_col: int
-        integer number of pixels between horizontal neighbors
+    pad_row: int
+        integer number of pixels between up/down neighbors
 
     """
     idx = np.random.randint(above.shape[0], size=num_preferred)
@@ -97,8 +97,9 @@ def pref_grid(above, bellow, num_preferred=10, abs_value=True, pad_col=5):
         first = i*num_preferred
         last = (i+1)*num_preferred
         X[first:last] = bellow[prefs]
-    visual = grid2d(X, pad_row=1, pad_col=pad_col)
-    return visual[:, pad_col-1:-pad_col+1]
+    visual = grid2d(X, pad_col=1, pad_row=self.pad_row)
+    return visual[pad_row-1:-pad_row+1, :]
+
 
 class DeepPref():
     """Similar do pref_grid but for deep networks.
@@ -114,17 +115,17 @@ class DeepPref():
         if True chooses the preferred as the weights associated with
         maximum absolute activation. Else, uses only the maximum (positve)
         values.
-    pad_col: int
+    pad_row: int
         integer number of pixels between horizontal neighbors
 
     """
     def __init__(self, model, layer, num_preferred=10, abs_value=True,
-                 pad_col=5, sum_preferences=False):
+                 pad_row=5, sum_preferences=False):
         self.model = model
         self.layer = layer
         self.num_preferred = num_preferred
         self.abs_value = abs_value
-        self.pad_col = pad_col
+        self.pad_row = pad_row
         self.sum_preferences = sum_preferences
         X = model.get_input()
         Y = model.layers[layer].get_output()
@@ -152,5 +153,5 @@ class DeepPref():
                 X[i] = (W[prefs]).mean(axis=0)
             else:
                 X[first:last] = W[prefs]
-        visual = grid2d(X, pad_row=1, pad_col=self.pad_col)
-        return visual[:, self.pad_col-1:-self.pad_col+1]
+        visual = grid2d(X, pad_col=1, pad_row=self.pad_row)
+        return visual[self.pad_row-1:-self.pad_row+1, :]
