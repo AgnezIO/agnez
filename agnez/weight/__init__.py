@@ -81,7 +81,7 @@ def pref_grid(above, bellow, num_preferred=10, abs_value=True, pad_col=5):
         number of preferred weights to be plotted
     abs_value: bool
         if True chooses the preferred as the weights associated with
-        maximum absolute activation. Else, uses only the maximum positve
+        maximum absolute activation. Else, uses only the maximum (positve)
         values.
     pad_col: int
         integer number of pixels between horizontal neighbors
@@ -98,3 +98,48 @@ def pref_grid(above, bellow, num_preferred=10, abs_value=True, pad_col=5):
         X[first:last] = bellow[prefs]
     visual = grid2d(X, pad_row=1, pad_col=pad_col)
     return visual[:, pad_col-1:-pad_col+1]
+
+class DeepPref():
+    """Similar do pref_grid but for deep networks.
+    Checks what are the weights in layers[0] that layers[-1] prefers.
+
+    Parameters
+    ----------
+    model: `keras.models.Sequential`
+    layer: int, observed layer
+    num_preferred: int
+        number of preferred weights to be plotted
+    abs_value: bool
+        if True chooses the preferred as the weights associated with
+        maximum absolute activation. Else, uses only the maximum (positve)
+        values.
+    pad_col: int
+        integer number of pixels between horizontal neighbors
+
+    """
+    def __init__(self, model, layer, num_preferred=10, abs_value=True,
+                 pad_col=5):
+        self.model = model
+        self.layer = layer
+        self.num_preferred = num_preferred
+        self.abs_value = abs_value
+        self.pad_col = pad_col
+        X = model.get_input()
+        Y = model.layers[layer].get_output()
+        self.F = theano.function([X], Y, allow_input_downcast=True)
+        above = model.layers[layer].W.get_value().shape[1]
+        self.idx = np.random.randint(above, size=num_preferred)
+
+    def get_pref(self):
+        W = model.layers[0].get_value().T
+        Y = self.F(W)
+        R = np.abs(above[:, idx]) if self.abs_value else above[:, idx]
+        X = np.zeros((self.num_preferred**2, W.shape[1]))
+        for i, w in enumerate(R.T):
+            s = np.argsort(w)
+            prefs = s[:-num_preferred-1:-1]
+            first = i*num_preferred
+            last = (i+1)*num_preferred
+            X[first:last] = W[prefs]
+        visual = grid2d(X, pad_row=1, pad_col=pad_col)
+        return visual[:, pad_col-1:-pad_col+1]

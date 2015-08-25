@@ -10,9 +10,9 @@ from bokeh.plotting import (cursession, figure, output_server,
 
 
 class BokehCallback(Callback):
-    def __init__(self, fig_name, url):
+    def __init__(self, name, fig_title, url):
         """
-        fig_name: Figure Title
+        fig_title: Figure Title
         url : str, optional
             Url of the bokeh-server. Ex: when starting the bokeh-server with
             ``bokeh-server --ip 0.0.0.0`` at ``alice``, server_url should be
@@ -23,10 +23,29 @@ class BokehCallback(Callback):
         Reference: mila-udem/blocks-extras
         """
         Callback.__init__(self)
-        self.fig_name = fig_name
+        self.name = name
+        self.fig_title = fig_title
         self.plots = []
-        output_server(fig_name, url=url)
+        output_server(fig_title, url=url)
         cursession().publish()
+
+    def get_image(self):
+        raise NotImplemented
+
+    def on_epoch_end(self, epoch, logs={}):
+        I = self.get_image()
+        if not hasattr(self, 'fig'):
+            self.fig = figure(title=self.fig_title,
+                              x_range=[0, 1], y_range=[0, 1])
+            self.fig.image(image=[I], x=[0], y=[0], dw=[1], dh=[1],
+                           name='weight')
+            renderer = self.fig.select({'name': 'weight'})
+            self.plots.append(renderer[0].data_source)
+            show(self.fig)
+        else:
+            self.plots[0].data['image'] = [I]
+        cursession().store_objects(self.plots[0])
+        push()
 
 
 class Plot(BokehCallback):
@@ -39,8 +58,8 @@ class Plot(BokehCallback):
     Inspired by https://github.com/mila-udem/blocks-extras/blob/master/blocks/extras/extensions/plot.py
 
     '''
-    def __init__(self, fig_name='training', url='default'):
-        BokehCallback.__init__(self, fig_name, url)
+    def __init__(self, name, fig_title='training', url='default'):
+        BokehCallback.__init__(self, name, fig_title, url)
         self.totals = {}
 
     def on_epoch_begin(self, epoch, logs={}):
@@ -58,7 +77,7 @@ class Plot(BokehCallback):
 
     def on_epoch_end(self, epoch, logs={}):
         if not hasattr(self, 'fig'):
-            self.fig = figure(title=self.fig_name)
+            self.fig = figure(title=self.fig_title)
             for i, v in enumerate(['loss', 'val_loss']):
                 if v == 'loss':
                     L = self.totals[v] / self.seen
@@ -86,23 +105,36 @@ class Grid2D(BokehCallback):
     '''
     W: weight matrix to visualize, each filter should go into a row,
        filters sizes must be square
+
+    See also BokehCallback `on_batch_end` method
+
     '''
-    def __init__(self, W, fig_name='grid', url='default',):
-        BokehCallback.__init__(self, fig_name, url)
+    def __init__(self, W, fig_title='grid', url='default',):
+        BokehCallback.__init__(self, name, fig_title, url)
         self.W = W
         self.F = theano.function([], W)
 
-    def on_epoch_end(self, epoch, logs={}):
-        I = grid2d(self.F())
-        if not hasattr(self, 'fig'):
-            self.fig = figure(title=self.fig_name,
-                              x_range=[0, 1], y_range=[0, 1])
-            self.fig.image(image=[I], x=[0], y=[0], dw=[1], dh=[1],
-                           name='weight')
-            renderer = self.fig.select({'name': 'weight'})
-            self.plots.append(renderer[0].data_source)
-            show(self.fig)
-        else:
-            self.plots[0].data['image'] = [I]
-        cursession().store_objects(self.plots[0])
-        push()
+    def get_image(self):
+        return grid2d(self.F())
+
+
+
+class PreferedInput(BokehCallback):
+    '''
+    model: Keras Sequential model
+    layer: int (>= 1) value of the desired layer to visualize
+
+    NOTE: This method calculates the prefered first layer weights of a upper
+          hidden layer. It simply checks what are the strongest connections.
+
+    See also BokehCallback `on_batch_end` method
+
+    '''
+    def __init__(self, model, layer, name='experiment', fig_title='pref_grid',
+                 url='default',):
+        BokehCallback.__init__(self, name, fig_title, url)
+        self.model = model
+        self.deep_pref = DeepPref(model, layer)
+
+    def get_image(self):
+        return self.deep_pref.get_pref()
