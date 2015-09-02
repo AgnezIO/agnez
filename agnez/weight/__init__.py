@@ -88,16 +88,17 @@ def pref_grid(above, bellow, num_preferred=9, abs_value=True, pad_row=5):
         integer number of pixels between up/down neighbors
 
     """
-    idx = np.random.randint(above.shape[0], size=num_preferred)
-    R = np.abs(above[idx]) if abs_value else above[idx]
+    # idx = np.random.randint(above.shape[0], size=num_preferred)
+    R = np.abs(above) if abs_value else above
     X = np.zeros((num_preferred**2, bellow.shape[1]))
     for i, w in enumerate(R):
-        s = np.argsort(w)
+        #s = np.argsort(w)[::-1]
         prefs = s[:-num_preferred-1:-1]
+        #prefs = s[:num_preferred]
         first = i*num_preferred
         last = (i+1)*num_preferred
         X[first:last] = bellow[prefs]
-    visual = grid2d(X, pad_col=1, pad_row=self.pad_row)
+    visual = grid2d(X, pad_col=1, pad_row=pad_row)
     return visual[pad_row-1:-pad_row+1, :]
 
 

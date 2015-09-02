@@ -107,13 +107,15 @@ class Grid2D(BokehCallback):
     See also BokehCallback `on_batch_end` method
 
     '''
-    def __init__(self, W, name='experiment', fig_title='grid', url='default',):
+    def __init__(self, W, num_weights=100, name='experiment',
+                 fig_title='grid', url='default',):
         BokehCallback.__init__(self, name, fig_title, url)
         self.W = W
+        self.num_weights = num_weights
 
     def get_image(self):
         W = self.W.get_value().T
-        return grid2d(W)
+        return grid2d(W[:self.num_weights])
 
 
 class PreferedInput(BokehCallback):

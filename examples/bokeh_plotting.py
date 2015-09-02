@@ -8,6 +8,9 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import SGD, Adam, RMSprop
 from keras.utils import np_utils
+from keras.utils.theano_utils import shared_scalar
+
+from seya.optimizers import ISTA, Adamista
 
 from agnez.keras_callbacks import Grid2D, Plot, PreferedInput
 
@@ -36,7 +39,7 @@ from agnez.keras_callbacks import Grid2D, Plot, PreferedInput
 
 batch_size = 100
 nb_classes = 10
-nb_epoch = 20
+nb_epoch = 1000
 
 # the data, shuffled and split between tran and test sets
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -55,17 +58,21 @@ Y_train = np_utils.to_categorical(y_train, nb_classes)
 Y_test = np_utils.to_categorical(y_test, nb_classes)
 
 model = Sequential()
-model.add(Dense(784, 128))
+model.add(Dense(784, 1200))
 model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(Dense(128, 128))
+model.add(Dropout(0.5))
+model.add(Dense(1200, 1200))
 model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(Dense(128, 10))
+model.add(Dropout(0.5))
+model.add(Dense(1200, 10))
 model.add(Activation('softmax'))
 
-rms = RMSprop()
-model.compile(loss='categorical_crossentropy', optimizer=rms)
+# rms = RMSprop()
+# opt = ISTA(lr=.001, momentum=.9, lambdav=shared_scalar(.0005),
+#            soft_threshold=True)
+opt = Adamista(lambdav=shared_scalar(.0005))
+opt = Adam()
+model.compile(loss='categorical_crossentropy', optimizer=opt)
 
 '''
 We will visualize the weights of the first layer. Note that Grid2D assumes
@@ -81,14 +88,20 @@ pref = PreferedInput(name=ex_name, fig_title="Second layer preferences",
 sum_pref = PreferedInput(sum_preferences=True, name=ex_name,
                          fig_title="Second layer preferences (summed up)",
                          url='default', model=model, layer=3) # Layer 3 is the
+pref2 = PreferedInput(name=ex_name, fig_title="Third layer preferences",
+                     url='default', model=model, layer=6) # Layer 3 is the
+                                                          # second Dense layer
+sum_pref2 = PreferedInput(sum_preferences=True, name=ex_name,
+                         fig_title="Third layer preferences (summed up)",
+                         url='default', model=model, layer=6) # Layer 3 is the
 # this live plots the training and validation loss
 plot = Plot(name=ex_name, fig_title='MNIST MLP example', url='default')
 
 
 model.fit(X_train, Y_train, batch_size=batch_size,
           nb_epoch=nb_epoch, show_accuracy=True, verbose=2,
-          validation_data=(X_test, Y_test), callbacks=[plot, grid, pref,
-                                                       sum_pref])
+          validation_data=(X_test, Y_test),
+          callbacks=[plot, grid, pref, sum_pref, pref2, sum_pref2])
 
 score = model.evaluate(X_test, Y_test, show_accuracy=True, verbose=0)
 print('Test score:', score[0])
