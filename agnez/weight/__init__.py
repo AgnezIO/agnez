@@ -92,9 +92,8 @@ def pref_grid(above, bellow, num_preferred=9, abs_value=True, pad_row=5):
     R = np.abs(above) if abs_value else above
     X = np.zeros((num_preferred**2, bellow.shape[1]))
     for i, w in enumerate(R):
-        #s = np.argsort(w)[::-1]
-        prefs = s[:-num_preferred-1:-1]
-        #prefs = s[:num_preferred]
+        s = np.argsort(w)[::-1]
+        prefs = s[:num_preferred]
         first = i*num_preferred
         last = (i+1)*num_preferred
         X[first:last] = bellow[prefs]
