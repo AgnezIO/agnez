@@ -1,5 +1,5 @@
 '''This provides visualization tools for Keras.'''
-from . import grid2d, DeepPref
+from . import grid2d, DeepPref, video_grid
 
 from keras.callbacks import Callback
 from bokeh.plotting import (cursession, figure, output_server,
@@ -138,3 +138,19 @@ class PreferedInput(BokehCallback):
 
     def get_image(self):
         return self.deep_pref.get_pref()
+
+
+class SaveGif(Callback):
+    def __init__(self, filepath, display, X, how_often=10):
+        super(Callback, self).__init__()
+        self.filepath = filepath
+        self.how_often = how_often
+        self.display = display
+        self.X = X
+
+    def on_epoch_end(self, epoch, logs={}):
+        if epoch % self.how_often == 0:
+            rec = self.model.predict(self.X)
+            _ = video_grid(rec.transpose(1, 0, 2), self.filepath)
+            self.display.clear_output(wait=True)
+        print('Saved reconstruction.')
