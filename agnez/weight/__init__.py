@@ -31,8 +31,8 @@ def img_grid(X, rows_cols=None, rescale=True):
     else:
         rows, cols = rows_cols
 
-    total_height = rows * height + 9
-    total_width = cols * width + 19
+    total_height = rows * height + 2*rows - 1
+    total_width = cols * width
 
     if rescale:
         X = scale_norm(X)
