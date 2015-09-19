@@ -141,16 +141,18 @@ class PreferedInput(BokehCallback):
 
 
 class SaveGif(Callback):
-    def __init__(self, filepath, display, X, how_often=10):
+    def __init__(self, filepath, X, func, how_often=10, display=None):
         super(Callback, self).__init__()
         self.filepath = filepath
         self.how_often = how_often
         self.display = display
         self.X = X
+        self.func = func
 
     def on_epoch_end(self, epoch, logs={}):
         if epoch % self.how_often == 0:
-            rec = self.model.predict(self.X)
+            rec = self.func(self.X)
             _ = video_grid(rec.transpose(1, 0, 2), self.filepath)
-            self.display.clear_output(wait=True)
-        print('Saved reconstruction.')
+            if self.display is not None:
+                self.display.clear_output(wait=True)
+        print('Saved gif.')
