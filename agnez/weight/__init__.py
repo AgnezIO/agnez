@@ -1,6 +1,63 @@
 import numpy as np
-from gaborfitting import *
+# from gaborfitting import *
+import theano
 import theano.tensor as T
+
+
+def scale_norm(X):
+    X = X - X.min()
+    scale = (X.max() - X.min())
+    return X / scale
+
+
+def img_grid(X, rows_cols=None, rescale=True):
+    """Image Grid: modified from jbornschein/draw
+
+    Parameters:
+    ===========
+    X : np.array, images (samples, channels, height, width)
+    rows_cols : list, grid dimensions (rows, cols)
+    rescale : bool
+
+    Returns:
+    ========
+    I : np.array, grid image
+    """
+    N, channels, height, width = X.shape
+
+    if rows_cols is None:
+        cols = np.ceil(np.sqrt(X.shape[0]))
+        rows = X.shape[0] - cols
+    else:
+        rows, cols = rows_cols
+
+    total_height = rows * height + 9
+    total_width = cols * width + 19
+
+    if rescale:
+        X = scale_norm(X)
+
+    I = np.zeros((channels, total_height, total_width))
+    I.fill(1)
+
+    for i in xrange(N):
+        r = i // cols
+        c = i % cols
+
+        if rescale:
+            this = X[i]
+        else:
+            this = scale_norm(X[i])
+
+        offset_y, offset_x = r*height+r, c*width+c
+        I[0:channels, offset_y:(offset_y+height), offset_x:(offset_x+width)] = this
+
+    I = (255*I).astype(np.uint8)
+    if(channels == 1):
+        out = I.reshape((total_height, total_width))
+    else:
+        out = np.dstack(I).astype(np.uint8)
+    return out
 
 
 def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, rescale=True):
