@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 from functools import wraps
 
 from .embedding import _prepare_fig_labels
-from ..weight import grid2d
+from ..weight import img_grid
 
 
 def _prepare_axis(subplot, data=None):
@@ -120,8 +120,9 @@ def video_grid(video, ani_path='video_grid.gif', rescale=False):
 
     Parameters
     ----------
-    video: 3D `numpy.array`
-        array with image sequences with dimensions (frames, samples, dim)
+    video: 5D `numpy.array`
+        array with image sequences with dimensions (samples, frames, channels,
+                                                    height, width)
     ani_path: str
         path to save the animation
     rescale: bool
@@ -132,13 +133,13 @@ def video_grid(video, ani_path='video_grid.gif', rescale=False):
     ax1 = _prepare_axis(111)
     t, b, d = video.shape
 
-    grid = grid2d(video[:, 0, :])
+    grid = img_grid(video[:, 0])
 
     vid = ax1.imshow(grid, cmap='gray')
     # plt.draw()
 
     def make_frame(t, vid):
-        grid = grid2d(video[t], rescale=rescale)
+        grid = img_grid(video[:, t], rescale=rescale)
         vid.set_data(grid)
         return vid
 
