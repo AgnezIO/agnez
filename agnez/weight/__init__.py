@@ -31,8 +31,8 @@ def img_grid(X, rows_cols=None, rescale=True):
     else:
         rows, cols = rows_cols
 
-    total_height = rows * height + 2*rows - 1
-    total_width = cols * width
+    total_height = rows * height + rows - 1
+    total_width = cols * width + cols - 1
 
     if rescale:
         X = scale_norm(X)
@@ -118,6 +118,7 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, res
     visual = (display_array - display_array.min()) / (display_array.max() - display_array.min())
     visual = np.nan_to_num(visual)
     ret = visual if rescale else display_array
+    ret = (255*ret).astype(np.uint8)
     return ret
 
 

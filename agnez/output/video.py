@@ -129,9 +129,9 @@ def video_grid(video, ani_path='video_grid.gif', rescale=False):
         flag to rescale displayed images by grid2d
 
     '''
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10, 10))
     ax1 = _prepare_axis(111)
-    t, b, d = video.shape
+    t = video.shape[1]
 
     grid = img_grid(video[:, 0])
 
