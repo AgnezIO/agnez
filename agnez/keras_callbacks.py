@@ -1,6 +1,7 @@
 '''This provides visualization tools for Keras.'''
 from . import grid2d, DeepPref, video_grid
 
+from theano import function
 from keras.callbacks import Callback
 from bokeh.plotting import (cursession, figure, output_server,
                             push, show)
@@ -110,11 +111,11 @@ class Grid2D(BokehCallback):
     def __init__(self, W, num_weights=100, name='experiment',
                  fig_title='grid', url='default',):
         BokehCallback.__init__(self, name, fig_title, url)
-        self.W = W
+        self.W = function([], W)
         self.num_weights = num_weights
 
     def get_image(self):
-        W = self.W.get_value().T
+        W = self.W()
         return grid2d(W[:self.num_weights])
 
 

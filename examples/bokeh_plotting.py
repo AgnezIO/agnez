@@ -10,8 +10,6 @@ from keras.optimizers import SGD, Adam, RMSprop
 from keras.utils import np_utils
 from keras.utils.theano_utils import shared_scalar
 
-from seya.optimizers import ISTA, Adamista
-
 from agnez.keras_callbacks import Grid2D, Plot, PreferedInput
 
 '''
@@ -68,19 +66,14 @@ model.add(Dense(1200, 10))
 model.add(Activation('softmax'))
 
 # rms = RMSprop()
-# opt = ISTA(lr=.001, momentum=.9, lambdav=shared_scalar(.0005),
-#            soft_threshold=True)
-opt = Adamista(lambdav=shared_scalar(.0005))
 opt = Adam()
 model.compile(loss='categorical_crossentropy', optimizer=opt)
 
-'''
-We will visualize the weights of the first layer. Note that Grid2D assumes
-each filter is in a different row, this is why we transpose W.
-'''
+# We will visualize the weights of the first layer. Note that Grid2D assumes
+# each filter is in a different row, this is why we transpose W.
 ex_name = 'keras_example'
 grid = Grid2D(name=ex_name, fig_title="First layer weights", url='default',
-              W=model.layers[0].W) # TODO transpose W by default?
+              W=model.layers[0].W.T) # TODO transpose W by default?
 # think grid2d for hidden layers
 pref = PreferedInput(name=ex_name, fig_title="Second layer preferences",
                      url='default', model=model, layer=3) # Layer 3 is the
