@@ -7,9 +7,13 @@ __version__ = '0.1.0'
 import seaborn as sns
 sns.set_style('dark')
 sns.set_palette('muted')
-sns.set_context("notebook", font_scale=1.5,
-                rc={"lines.linewidth": 2.5})
+try:
+    import IPython
+    sns.set_context("notebook", font_scale=1.5,
+                    rc={"lines.linewidth": 2.5})
+except:
+    pass
 
-from weight import *
-from inputs import *
-from output import *
+from .grid import *
+from .embedding import *
+from .video import *

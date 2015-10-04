@@ -211,7 +211,7 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
 
 
 @animate
-def video_grid(video, ani_path='video_grid.gif', rescale=False):
+def video_grid2d(video, ani_path='video_grid.gif', rescale=False):
     '''2D video grid for parallel visualization
 
     Parameters
