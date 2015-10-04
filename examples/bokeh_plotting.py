@@ -6,9 +6,8 @@ np.random.seed(1337)  # for reproducibility
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
-from keras.optimizers import SGD, Adam, RMSprop
+from keras.optimizers import Adam, RMSprop
 from keras.utils import np_utils
-from keras.utils.theano_utils import shared_scalar
 
 from agnez.keras_callbacks import Grid2D, Plot, PreferedInput
 
