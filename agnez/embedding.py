@@ -7,7 +7,7 @@ from functools import wraps
 from sklearn.decomposition import PCA
 import matplotlib.animation as animation
 
-from agnez import grid2d
+from .grid import grid2d
 
 
 def embedding2d(data, train_data=None, method=None):
