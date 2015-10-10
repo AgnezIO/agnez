@@ -31,7 +31,7 @@ class SendImgur(Sender):
 
     def on_epoch_end(self, epoch=None, logs={}):
         img = self.generate_img()
-        res = self.client_upload_from_path(img)
+        res = self.client.upload_from_path(img)
         return requests.patch(self.app_url, json={
             'name': self.name, 'type': 'img', 'value': res['link'],
             'pos': self.position})
