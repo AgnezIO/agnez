@@ -17,7 +17,7 @@ class Sender(Callback):
         r = requests.post(app_url, json={
             'name': name, 'type': '', 'value': '',
             'pos': ''})
-        self.app_url += '/' + str(json.loads(r.text)['id'])
+        self.app_url += '/' + str(json.loads(r.text)['_id'])
 
 
 class SendImgur(Sender):
