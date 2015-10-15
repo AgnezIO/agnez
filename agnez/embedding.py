@@ -210,6 +210,7 @@ def video_embedding(video, embedding, labels, ani_path='video_ebd.gif'):
     return make_frame, fig, (sc, vid), t*b, ani_path
 
 
+"""
 @animate
 def video_grid2d(video, ani_path='video_grid.gif', rescale=False):
     '''2D video grid for parallel visualization
@@ -239,3 +240,4 @@ def video_grid2d(video, ani_path='video_grid.gif', rescale=False):
         return vid
 
     return make_frame, fig, (vid,), t, ani_path
+"""
