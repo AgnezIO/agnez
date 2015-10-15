@@ -1,5 +1,5 @@
 '''This provides visualization tools for Keras.'''
-from . import grid2d, DeepPref, video_grid
+from . import grid2d, DeepPref, video_grid2d
 
 from theano import function
 from keras.callbacks import Callback
@@ -153,7 +153,7 @@ class SaveGif(Callback):
     def on_epoch_end(self, epoch, logs={}):
         if epoch % self.how_often == 0:
             rec = self.func(self.X)
-            _ = video_grid(rec.transpose(1, 0, 2), self.filepath)
+            _ = video_grid2d(rec.transpose(1, 0, 2), self.filepath)
             if self.display is not None:
                 self.display.clear_output(wait=True)
         print('Saved gif.')
