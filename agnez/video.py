@@ -52,6 +52,38 @@ def animate(func):
         return ani
     return wrapper
 
+@animate
+def make_gif(video, filepath='video.gif', gray=False):
+    '''Transform a sequence of images into a gif
+
+    Parameters
+    ----------
+    video: 3D `numpy.array`
+        array with image sequences with dimensions (frames, row, col, channels)
+    filepath: str
+        path to save the animation
+    rescale: bool
+        flag to rescale displayed images by grid2d
+    gray: bool
+        gray scale?
+
+    '''
+    fig = plt.figure()
+    ax1 = _prepare_axis(111)
+    t = video.shape[0]
+
+    if gray:
+        vid = ax1.imshow(video[0])
+    else:
+        vid = ax1.imshow(video[0], cmap='gray')
+    # plt.draw()
+
+    def make_frame(t, vid):
+        vid.set_data(video[t])
+        return vid
+
+    return make_frame, fig, (vid,), t, filepath
+
 
 @animate
 def timeseries2dvideo(data, labels, filepath='ts2video.gif'):
@@ -189,7 +221,7 @@ def video_grid2d(video, filepath='video_grid.gif', rescale=False):
     ax1 = _prepare_axis(111)
     t, b, d = video.shape
 
-    grid = grid2d(video[:, 0, :])
+    grid = grid2d(video[0])
 
     vid = ax1.imshow(grid, cmap='gray')
     # plt.draw()
