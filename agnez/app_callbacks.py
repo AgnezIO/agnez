@@ -4,7 +4,10 @@ import json
 import mpld3
 
 from keras.callbacks import Callback
-from imgurpython import ImgurClient
+try:
+    from imgurpython import ImgurClient
+except:
+    print "imgrupython not installed, can't use SendImgur"
 
 
 class Sender(Callback):
