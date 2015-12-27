@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 # from gaborfitting import *
 import theano
@@ -27,7 +28,7 @@ def img_grid(X, rows_cols=None, rescale=True):
 
     if rows_cols is None:
         cols = np.ceil(np.sqrt(X.shape[0]))
-        rows = X.shape[0] - cols
+        rows = np.ceil(X.shape[0] / cols)
     else:
         rows, cols = rows_cols
 
@@ -50,7 +51,8 @@ def img_grid(X, rows_cols=None, rescale=True):
             this = scale_norm(X[i])
 
         offset_y, offset_x = r*height+r, c*width+c
-        I[0:channels, offset_y:(offset_y+height), offset_x:(offset_x+width)] = this
+        I[0:channels, offset_y:(offset_y+height),
+          offset_x:(offset_x+width)] = this
 
     I = (255*I).astype(np.uint8)
     if(channels == 1):
@@ -60,7 +62,8 @@ def img_grid(X, rows_cols=None, rescale=True):
     return out
 
 
-def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, rescale=True):
+def grid2d(X, example_width=False, display_cols=False, pad_row=1,
+           pad_col=1, rescale=True):
     """Display weights in a nice grid
 
     This function assumes that each row of the X is an image weight to be
@@ -108,9 +111,10 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1, pad_col=1, res
                       for q in range(example_width)
                       for nn in range(example_height)]
             try:
-                newData = (X[curr_ex, :].reshape((example_height, example_width))).T/max_val
+                newData = (X[curr_ex, :].reshape((example_height,
+                                                  example_width))).T/max_val
             except:
-                raise ValueError("expected {}, got {}".format(X[curr_ex, :].shape), (example_height, example_width))
+                raise ValueError("expected {}, got {}".format(X[curr_ex,:].shape), (example_height, example_width))
             display_array[i_inds, j_inds] = newData.flatten()
             curr_ex += 1
         if curr_ex >= m:
