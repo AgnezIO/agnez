@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 # from gaborfitting import *
 import theano
@@ -27,8 +26,9 @@ def img_grid(X, rows_cols=None, rescale=True):
     N, channels, height, width = X.shape
 
     if rows_cols is None:
-        cols = np.ceil(np.sqrt(X.shape[0])).astype('int')
+        cols = np.sqrt(X.shape[0])
         rows = np.ceil(X.shape[0] / cols).astype('int')
+        cols = np.ceil(cols).astype('int')
     else:
         rows, cols = rows_cols
 
