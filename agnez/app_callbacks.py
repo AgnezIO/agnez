@@ -26,8 +26,8 @@ class Sender(Callback):
         self.position = position
         self.cell_type = cell_type
         r = requests.post(app_url, json={
-            'name': name, 'type': self.cell_type, 'value': '',
-            'pos': '', 'description': self.description})
+            'name': self.name, 'type': self.cell_type, 'value': [],
+            'pos': self.position, 'description': self.description})
         self.app_url += '/' + str(json.loads(r.text)['_id'])
 
 
