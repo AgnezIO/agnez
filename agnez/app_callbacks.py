@@ -17,7 +17,8 @@ from .grid import img_grid
 
 
 class Sender(Callback):
-    def __init__(self, name, description, position, cell_type, app_url=app_url):
+    def __init__(self, name, description, position, cell_type,
+                 app_url=app_url):
         super(Sender, self).__init__()
         self.app_url = app_url
         self.name = name
@@ -26,7 +27,7 @@ class Sender(Callback):
         self.cell_type = cell_type
         r = requests.post(app_url, json={
             'name': name, 'type': self.cell_type, 'value': '',
-            'pos': ''})
+            'pos': '', 'description': self.description})
         self.app_url += '/' + str(json.loads(r.text)['_id'])
 
 
@@ -64,8 +65,9 @@ class SendFigHTML(Sender):
 
 
 class LossPlot(Sender, History):
-    def __init__(self, name='Loss plot', position=0, app_url=app_url,
-                 description='train (blue) and validation (green) learning curves'):
+    def __init__(
+            self, name='Loss plot', position=0, app_url=app_url,
+            description='train (blue) and validation (green) learning curves'):
         super(LossPlot, self).__init__(name, description, position,
                                        'html', app_url)
         self.train_values = []
@@ -78,32 +80,36 @@ class LossPlot(Sender, History):
         fig = plt.figure(figsize=(8, 5))
         plt.plot(self.train_values)
         plt.plot(self.valid_values)
-        plt.xlabel('epochs')
-        plt.ylabel('loss')
+        # plt.xlabel('epochs')
+        # plt.ylabel('loss')
         html = mpld3.fig_to_html(fig)
         plt.close(fig)
 
-        return requests.patch(self.app_url, json={
+        requests.patch(self.app_url, json={
             'name': self.name, 'type': 'html', 'value': html,
             'pos': self.position, 'description': self.description})
 
 
 class VisualizeConvWeights(Sender):
-    def __init__(self, weights, name='Conv weights', position=0,
-                 app_url=app_url,
+    def __init__(self, weights, static_path, name='Conv weights',
+                 position=1, app_url=app_url,
                  description='weights of convolutional layer'):
         super(VisualizeConvWeights, self).__init__(name, description, position,
-                                                   'html', app_url)
+                                                   'img', app_url)
         self.weights = weights
+        self.static_path = static_path
 
     def on_epoch_end(self, epoch, logs={}):
         W = np.asarray(K.eval(self.weights))
         I = img_grid(W)
         fig = plt.figure(figsize=(8, 5))
         plt.imshow(I)
-        html = mpld3.fig_to_html(fig)
+        plt.savefig(os.path.join(self.static_path, 'images',
+                                 self.name+'.png'))
+        # html = mpld3.fig_to_html(fig)
         plt.close(fig)
 
-        return requests.patch(self.app_url, json={
-            'name': self.name, 'type': 'html', 'value': html,
+        requests.patch(self.app_url, json={
+            'name': self.name, 'type': 'img',
+            'value': os.path.join('./images', self.name+'.png'),
             'pos': self.position, 'description': self.description})

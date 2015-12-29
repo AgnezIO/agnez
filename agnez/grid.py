@@ -26,14 +26,14 @@ def img_grid(X, rows_cols=None, rescale=True):
     N, channels, height, width = X.shape
 
     if rows_cols is None:
-        cols = np.sqrt(X.shape[0])
-        rows = np.ceil(X.shape[0] / cols).astype('int')
-        cols = np.ceil(cols).astype('int')
+        sroot = np.sqrt(X.shape[0])
+        cols = int(np.ceil(sroot)) + 1
+        rows = int(np.floor(sroot))
     else:
         rows, cols = rows_cols
 
-    total_height = rows * height + rows - 1
-    total_width = cols * width + cols - 1
+    total_height = int(rows * height + rows - 1)
+    total_width = int(cols * width + cols - 1)
 
     if rescale:
         X = scale_norm(X)
@@ -51,8 +51,7 @@ def img_grid(X, rows_cols=None, rescale=True):
             this = scale_norm(X[i])
 
         offset_y, offset_x = r*height+r, c*width+c
-        I[0:channels, offset_y:(offset_y+height),
-          offset_x:(offset_x+width)] = this
+        I[0:channels, offset_y:(offset_y+height), offset_x:(offset_x+width)] = this
 
     I = (255*I).astype(np.uint8)
     if(channels == 1):
@@ -114,7 +113,7 @@ def grid2d(X, example_width=False, display_cols=False, pad_row=1,
                 newData = (X[curr_ex, :].reshape((example_height,
                                                   example_width))).T/max_val
             except:
-                raise ValueError("expected {}, got {}".format(X[curr_ex,:].shape), (example_height, example_width))
+                raise ValueError("expected {}, got {}".format(X[curr_ex, :].shape), (example_height, example_width))
             display_array[i_inds, j_inds] = newData.flatten()
             curr_ex += 1
         if curr_ex >= m:
