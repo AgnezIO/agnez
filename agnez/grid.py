@@ -27,8 +27,8 @@ def img_grid(X, rows_cols=None, rescale=True):
 
     if rows_cols is None:
         sroot = np.sqrt(X.shape[0])
-        cols = int(np.ceil(sroot)) + 1
-        rows = int(np.floor(sroot))
+        cols = int(np.ceil(sroot))
+        rows = int(np.floor(sroot)) + 1
     else:
         rows, cols = rows_cols
 
