@@ -6,8 +6,17 @@ import seaborn as sns
 from functools import wraps
 from sklearn.decomposition import PCA
 import matplotlib.animation as animation
+import matplotlib.patches as mpatches
 
-from .grid import grid2d
+# from .grid import grid2d
+
+
+def _get_legend(palette, labels):
+    handles = []
+    for c, l in zip(palette, np.unique(labels)):
+        patch = mpatches.Patch(color=c, label=l)
+        handles.append(patch)
+    return handles
 
 
 def embedding2d(data, train_data=None, method=None):
@@ -24,7 +33,7 @@ def embedding2d(data, train_data=None, method=None):
     return ebd, method
 
 
-def embedding2dplot(data, labels):
+def embedding2dplot(data, labels, show_median=True, show_legend=True):
     '''2D embedding visualization.
 
     Modified from:
@@ -44,17 +53,23 @@ def embedding2dplot(data, labels):
     ax.axis('off')
     ax.axis('tight')
 
-    # We add the labels for each digit.
-    txts = []
-    for i in range(10):
-        # Position of each label.
-        xtext, ytext = np.median(data[labels == i, :], axis=0)
-        txt = ax.text(xtext, ytext, str(i), fontsize=24)
-        txt.set_path_effects([
-            PathEffects.Stroke(linewidth=5, foreground="w"),
-            PathEffects.Normal()])
-        txts.append(txt)
-    return fig, ax, sc, txts
+    # We add the labels for each cluster.
+    if show_median:
+        txts = []
+        for i in range(10):
+            # Position of each label.
+            xtext, ytext = np.median(data[labels == i, :], axis=0)
+            txt = ax.text(xtext, ytext, str(i), fontsize=24)
+            txt.set_path_effects([
+                PathEffects.Stroke(linewidth=5, foreground="w"),
+                PathEffects.Normal()])
+            txts.append(txt)
+
+    # Show labels as legend patches
+    if show_legend:
+        handles = _get_legend(palette, labels)
+        ax.legend(handles=handles)
+    return fig, ax, sc
 
 
 def timeseries2d(data, train_data=None, method=None):
