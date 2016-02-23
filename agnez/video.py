@@ -19,12 +19,14 @@ def image_sequence(X, shape):
 
     shape: list
     list with the shape to resize the flatten elements in X
+    convention is (channels, rows, columns)
 
     '''
     X = X.reshape((-1,)+shape)
     if len(shape) == 3:
-        X = X.swapaxes(0, 2)
-        X = X.reshape(shape[0], X.shape[2], shape[1]*shape[2])
+        print "here"
+        X = X.transpose(2, 0, 3, 1)
+        X = X.reshape(X.shape[0], X.shape[1]*X.shape[2], X.shape[3])
     else:
         X = X.swapaxes(0, 1)
         X = X.reshape((X.shape[0], X.shape[1]*X.shape[2]))
@@ -51,6 +53,7 @@ def animate(func):
         ani.save(filepath, writer='imagemagick', fps=5)
         return ani
     return wrapper
+
 
 @animate
 def make_gif(video, filepath='video.gif', gray=False):
