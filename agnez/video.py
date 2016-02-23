@@ -24,7 +24,6 @@ def image_sequence(X, shape):
     '''
     X = X.reshape((-1,)+shape)
     if len(shape) == 3:
-        print "here"
         X = X.transpose(2, 0, 3, 1)
         X = X.reshape(X.shape[0], X.shape[1]*X.shape[2], X.shape[3])
     else:
