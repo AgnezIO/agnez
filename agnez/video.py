@@ -47,20 +47,20 @@ def animate(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         make_frame, fig, fargs, video_length, filepath = func(*args, **kwargs)
-        ani = animation.FuncAnimation(fig, make_frame, frames=video_length, interval=100,
-                                      fargs=fargs)
+        ani = animation.FuncAnimation(fig, make_frame, frames=video_length,
+                                      interval=100, fargs=fargs)
         ani.save(filepath, writer='imagemagick', fps=5)
         return ani
     return wrapper
 
 
 @animate
-def make_gif(video, filepath='video.gif', gray=False):
+def make_gif(video, filepath='video.gif', gray=True):
     '''Transform a sequence of images into a gif
 
     Parameters
     ----------
-    video: 3D `numpy.array`
+    video: 4D `numpy.array`
         array with image sequences with dimensions (frames, row, col, channels)
     filepath: str
         path to save the animation
@@ -77,11 +77,14 @@ def make_gif(video, filepath='video.gif', gray=False):
     if gray:
         vid = ax1.imshow(video[0])
     else:
-        vid = ax1.imshow(video[0], cmap='gray')
+        vid = ax1.imshow(video[0, :, :, 0], cmap='gray')
     # plt.draw()
 
     def make_frame(t, vid):
-        vid.set_data(video[t])
+        v = video[t]
+        if video.shape[-1] == 1:
+            v = v[:, :, 0]
+        vid.set_data(v)
         return vid
 
     return make_frame, fig, (vid,), t, filepath
@@ -117,11 +120,6 @@ def timeseries2dvideo(data, labels, filepath='ts2video.gif'):
         sc.set_facecolors(colors)
     return make_frame, fig, (sc,), data.shape[0], filepath
 
-    # TODO delete this
-    # ani = animation.FuncAnimation(fig, make_frame, frames=data.shape[0], interval=100, fargs=(sc,))
-    # ani.save(filepath, writer='imagemagick', fps=10)
-    # return ani
-
 
 @animate
 def video_embedding(video, embedding, labels, filepath='video_ebd.gif'):
@@ -154,7 +152,8 @@ def video_embedding(video, embedding, labels, filepath='video_ebd.gif'):
     dim = np.sqrt(d).astype('int')
 
     init_frame = video[0].reshape((dim, dim))
-    vid = ax1.imshow(init_frame, cmap='gist_gray_r', vmin=video.min(), vmax=video.max())
+    vid = ax1.imshow(init_frame, cmap='gist_gray_r', vmin=video.min(),
+                     vmax=video.max())
     # plt.draw()
 
     def make_frame(t, sc, vid):
