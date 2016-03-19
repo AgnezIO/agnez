@@ -55,7 +55,7 @@ def animate(func):
 
 
 @animate
-def make_gif(video, filepath='video.gif', gray=True):
+def make_gif(video, filepath='video.gif', gray=True, interpolation=None):
     '''Transform a sequence of images into a gif
 
     Parameters
@@ -75,9 +75,9 @@ def make_gif(video, filepath='video.gif', gray=True):
     t = video.shape[0]
 
     if gray:
-        vid = ax1.imshow(video[0])
+        vid = ax1.imshow(video[0], interpolation=interpolation)
     else:
-        vid = ax1.imshow(video[0, :, :, 0], cmap='gray')
+        vid = ax1.imshow(video[0], cmap='gray', interpolation=interpolation)
     # plt.draw()
 
     def make_frame(t, vid):
