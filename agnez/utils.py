@@ -7,6 +7,29 @@ except:
   print("can't import video_at_notebook")
 
 
+def to_01c(img):
+    """Make sure we get row, col, channels"""
+    if len(img) == 2:
+        return img
+    else:
+        if img.shape[0] == 3:
+            return img.transpose(1, 2, 0)
+        else:
+            return img
+
+
+
+def to_c01(img):
+    """Make sure we get channels, row, col"""
+    if len(img) == 2:
+        return img
+    else:
+        if img.shape[2] == 3:
+            return img.transpose(2, 0, 1)
+        else:
+            return img
+
+
 def imshow(img):
     if len(img.shape) == 2:  # gray
         plt.imshow(img, cmap="gray")
