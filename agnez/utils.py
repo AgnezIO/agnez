@@ -1,6 +1,20 @@
 import io
 import base64
-from IPython.display import HTML
+import matplotlib.pyplot as plt
+try:
+  from IPython.display import HTML
+except:
+  print("can't import video_at_notebook")
+
+
+def imshow(img):
+    if len(img.shape) == 2:  # gray
+        plt.imshow(img, cmap="gray")
+    else:  # color
+        if img.shape[0] == 3:
+            plt.imshow(img.transpose(1, 2, 0))
+        else:
+            plt.imshow(img)
 
 
 def video_at_notebook(video_path):

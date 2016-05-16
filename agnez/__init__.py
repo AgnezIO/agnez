@@ -17,3 +17,4 @@ except:
 from .grid import *
 from .embedding import *
 from .video import *
+from .utils import *
